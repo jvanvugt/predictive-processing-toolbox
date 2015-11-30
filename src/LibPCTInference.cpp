@@ -8,9 +8,7 @@ using namespace std;
 
 extern "C" {
   
-  void SetAlgorithm (char* NetworkName, int AlgorithmIndex) {
-	DSL_network theNet;
-	theNet.ReadFile(NetworkName);
+  void SetAlgorithm (DSL_network* Network, int AlgorithmIndex) {
 		/*
 		1 DSL_ALG_BN_LAURITZEN;
 		2 DSL_ALG_BN_HENRION ;
@@ -23,25 +21,22 @@ extern "C" {
 		9 DSL_ALG_BN_LBP ;
 		10 DSL_ALG_BN_LAURITZEN_OLD;
 		*/
-	theNet.SetDefaultBNAlgorithm(AlgorithmIndex);
-	theNet.WriteFile(NetworkName);
+	Network->SetDefaultBNAlgorithm(AlgorithmIndex);
   };
   
   
   
-  double* BelieveUpdating(char * NetworkName, int AlgorithmIndex, char * TargetNodes[], char * EvidenceNodes[], char* Evidences[]){
-	DSL_network theNet;
-	theNet.ReadFile(NetworkName);
+  double* BelieveUpdating(DSL_network* Network, int AlgorithmIndex, char * TargetNodes[], char * EvidenceNodes[], char* Evidences[]){
 	// DSL_node* node
   
 	// Set Algorithm
-	theNet.SetDefaultBNAlgorithm(AlgorithmIndex);
+	Network->SetDefaultBNAlgorithm(AlgorithmIndex);
     
 	// Set Evidences
 	int i=0;
 	while (strcmp(EvidenceNodes[i],"LISTEND")!=0)
 	{
-		DSL_node* node = theNet.GetNode(theNet.FindNode(EvidenceNodes[i]));
+		DSL_node* node = Network->GetNode(Network->FindNode(EvidenceNodes[i]));
 		int EvidenceId = node->Definition()->GetOutcomesNames()->FindPosition(Evidences[i]);
 		node->Value()->SetEvidence(EvidenceId);
 		i++;
@@ -51,20 +46,20 @@ extern "C" {
 	i=0;
 	while (strcmp(TargetNodes[i],"LISTEND")!=0)
 	{
-		theNet.SetTarget(theNet.FindNode(TargetNodes[i]));
+		Network->SetTarget(Network->FindNode(TargetNodes[i]));
 		i++;
 	}
 	
 	//Update
-	theNet.UpdateBeliefs();
+	Network->UpdateBeliefs();
 	
 	//Read target probabilities
-	int NodeNumber = theNet.GetNumberOfNodes();
+	int NodeNumber = Network->GetNumberOfNodes();
 	
 	int TotalOutcomeNumber;
 	for (int i=0; i<NodeNumber; i++)
 	{
-		TotalOutcomeNumber+=(theNet.GetNode(i)->Definition()->GetNumberOfOutcomes())+1;
+		TotalOutcomeNumber+=(Network->GetNode(i)->Definition()->GetNumberOfOutcomes())+1;
 	}
 
 	double* Rdouble = (double*)malloc(sizeof(double) * (NodeNumber+1)*(2+1)+1);
@@ -75,7 +70,7 @@ extern "C" {
 	int iout=0;
 	while (strcmp(TargetNodes[i],"LISTEND")!=0)
 	{
-		DSL_node* node = theNet.GetNode(theNet.FindNode(TargetNodes[i]));
+		DSL_node* node = Network->GetNode(Network->FindNode(TargetNodes[i]));
 		Values = node->Value()->GetMatrix();
 // 		cout << ((char*)node->Info().Header().GetId()) << endl;
 // 		cout << "Dimensionsize = " << Values->GetSizeOfDimension(0) << endl;
@@ -98,7 +93,7 @@ extern "C" {
 	{
 		for (int i=0; i<NodeNumber; i++)
 		{
-			DSL_node* node = theNet.GetNode(i);
+			DSL_node* node = Network->GetNode(i);
 			Values = node->Value()->GetMatrix();
 // 			cout << ((char*)node->Info().Header().GetId()) << endl;
 // 			cout << "Dimensionsize = " << Values->GetSizeOfDimension(0) << endl;

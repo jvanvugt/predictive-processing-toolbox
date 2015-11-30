@@ -3,67 +3,70 @@ import numpy
 from lib_pct_tools import *
 
 PCTr=CDLL("./LibPCTReadNetwork.so")
-#libc = CDLL(ctypes.util.find_library('c'))
 
-DefaultNetworkName="TestNetwork";
+PCTr.LoadNetwork.restype = c_void_p
 
+PCTr.ReloadNetwork.argtypes = [c_void_p, c_char_p]
+PCTr.ReloadNetwork.restype = None
 
+PCTr.NodeNames.argtypes = [c_void_p]
+PCTr.NodeNames.restype = POINTER(POINTER(c_char))
 
-def NodeExists(NetworkName=DefaultNetworkName, NodeName="Node"):
-	if PCTr.NodeExists(Ending(NetworkName), NodeName) == -2 :
-		return False
-	else:
-		return True
+PCTr.NodeNumber.argtypes = [c_void_p]
+PCTr.NodeNumber.restype = c_int
 
+PCTr.GetOutcomes.restype = POINTER(POINTER(c_char))
+PCTr.GetOutcomes.argtypes = [c_void_p, c_char_p]
 
-def NodeNumber(NetworkName=DefaultNetworkName):
-	return PCTr.NodeNumber(Ending(NetworkName))
+PCTr.GetParents.restype = POINTER(POINTER(c_char))
+PCTr.GetParents.argtypes = [c_void_p, c_char_p]
 
+PCTr.GetChildren.restype = POINTER(POINTER(c_char))
+PCTr.GetChildren.argtypes = [c_void_p, c_char_p]
 
-def NodeNames(NetworkName=DefaultNetworkName):
-	PCTr.NodeNames.restype = POINTER(POINTER(c_char))
-	c_names = PCTr.NodeNames(Ending(NetworkName))
-	names = [];	name=''; i=0;
-	while name!='LISTEND':
-		name=string_at(c_names[i]);
-		if (name!='LISTEND'):
-			names.append(name);
-		i+=1;
-	return names
+PCTr.NodeExists.restype = c_bool
+PCTr.NodeExists.argtypes = [c_void_p, c_char_p]
 
 
-def GetOutcomes(NetworkName=DefaultNetworkName, NodeName="Node"):
-	PCTr.GetOutcomes.restype = POINTER(POINTER(c_char))
-	c_names = PCTr.GetOutcomes(Ending(NetworkName),NodeName)
-	names = [];	name=''; i=0;
-	while name!='LISTEND':
-		name=string_at(c_names[i]);
-		if (name!='LISTEND'):
-			names.append(name);
-		i+=1;
-	return names
+DefaultNetworkName = "TestNetwork"
+
+def LoadNetwork(NetworkName=DefaultNetworkName):
+	return PCTr.LoadNetwork(Ending(NetworkName))
+
+def ReloadNetwork(Network, NetworkName=DefaultNetworkName):
+	PCTr.ReloadNetwork(Network, NetworkName)
+
+def NodeExists(Network, NodeName):
+	return PCTr.NodeExists(Network, NodeName)
 
 
-def GetParents(NetworkName=DefaultNetworkName, NodeName="Node"):
-	PCTr.GetParents.restype = POINTER(POINTER(c_char))
-	c_names = PCTr.GetParents(Ending(NetworkName),NodeName)
-	names = [];	name=''; i=0;
-	while name!='LISTEND':
-		name=string_at(c_names[i]);
-		if (name!='LISTEND'):
-			names.append(name);
-		i+=1;
-	return names
+def NodeNumber(Network):
+	return PCTr.NodeNumber(Network)
 
 
-def GetChildren(NetworkName=DefaultNetworkName, NodeName="Node"):
-	PCTr.GetChildren.restype = POINTER(POINTER(c_char))
-	c_names = PCTr.GetChildren(Ending(NetworkName),NodeName)
-	names = [];	name=''; i=0;
-	while name!='LISTEND':
-		name=string_at(c_names[i]);
-		if (name!='LISTEND'):
-			names.append(name);
-		i+=1;
-	return names
+def NodeNames(Network):
+	c_names = PCTr.NodeNames(Network)
+	return from_c_array(c_names)
+
+
+def GetOutcomes(Network, NodeName):
+	c_names = PCTr.GetOutcomes(Network, NodeName)
+	return from_c_array(c_names)
+
+
+def GetParents(Network, NodeName):
+	c_names = PCTr.GetParents(Network, NodeName)
+	return from_c_array(c_names)
+
+
+def GetChildren(Network, NodeName):
+	c_names = PCTr.GetChildren(Network, NodeName)
+	return from_c_array(c_names)
 	
+def from_c_array(array):
+	result = []
+	for element in array:
+		string = string_at(element)
+		if string == 'LISTEND':
+			return result
+		result.append(string)

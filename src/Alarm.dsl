@@ -4,7 +4,6 @@ net Unnamed
   {
    ID = Unnamed;
    NAME = "Unnamed";
-   COMMENT = "";
   };
  CREATION = 
   {
@@ -54,8 +53,8 @@ net Unnamed
     {
      POSITION = 
       {
-       CENTER_X = 607;
-       CENTER_Y = 110;
+       CENTER_X = 0;
+       CENTER_Y = 0;
        WIDTH = 76;
        HEIGHT = 36;
       };
@@ -113,8 +112,8 @@ net Unnamed
     {
      POSITION = 
       {
-       CENTER_X = 503;
-       CENTER_Y = 114;
+       CENTER_X = 0;
+       CENTER_Y = 0;
        WIDTH = 76;
        HEIGHT = 36;
       };
@@ -135,7 +134,7 @@ net Unnamed
    DEFINITION = 
     {
      NAMESTATES = (true, false);
-     PROBABILITIES = (0.52076090, 0.47923910);
+     PROBABILITIES = (0.02000000, 0.98000000);
     };
    EXTRA_DEFINITION = 
     {
@@ -172,8 +171,8 @@ net Unnamed
     {
      POSITION = 
       {
-       CENTER_X = 635;
-       CENTER_Y = 194;
+       CENTER_X = 0;
+       CENTER_Y = 0;
        WIDTH = 76;
        HEIGHT = 36;
       };
@@ -231,8 +230,8 @@ net Unnamed
     {
      POSITION = 
       {
-       CENTER_X = 511;
-       CENTER_Y = 191;
+       CENTER_X = 0;
+       CENTER_Y = 0;
        WIDTH = 76;
        HEIGHT = 36;
       };
@@ -279,13 +278,13 @@ net Unnamed
     };
   };
 
- node Blackout
+ node Leaving
   {
    TYPE = CPT;
    HEADER = 
     {
-     ID = Blackout;
-     NAME = "Blackout";
+     ID = Leaving;
+     NAME = "Leaving";
     };
    SCREEN = 
     {
@@ -309,71 +308,11 @@ net Unnamed
    DOCUMENTATION = 
     {
     };
-   PARENTS = ();
+   PARENTS = (Alarm);
    DEFINITION = 
     {
      NAMESTATES = (true, false);
-     PROBABILITIES = (0.00200000, 0.99800000);
-    };
-   EXTRA_DEFINITION = 
-    {
-     DIAGNOSIS_TYPE = AUXILIARY;
-     RANKED = FALSE;
-     MANDATORY = FALSE;
-     SETASDEFAULT = FALSE;
-     SHOWAS = 4;
-     FAULT_STATES = (0, 0);
-     FAULT_NAMES = ("", "");
-     FAULT_LABELS = ("", "");
-     DEFAULT_STATE = 0;
-     DOCUMENTATION = 
-      {
-      };
-     DOCUMENTATION = 
-      {
-      };
-     STATECOMMENTS = ("", "");
-     STATEREPAIRINFO = ("", "");
-     QUESTION = "";
-    };
-  };
-
- node Leaving
-  {
-   TYPE = CPT;
-   HEADER = 
-    {
-     ID = Leaving;
-     NAME = "Leaving";
-    };
-   SCREEN = 
-    {
-     POSITION = 
-      {
-       CENTER_X = 513;
-       CENTER_Y = 267;
-       WIDTH = 76;
-       HEIGHT = 36;
-      };
-     COLOR = 16250597;
-     SELCOLOR = 12303291;
-     FONT = 1;
-     FONTCOLOR = 0;
-     BORDERTHICKNESS = 1;
-     BORDERCOLOR = 12255232;
-    };
-   USER_PROPERTIES = 
-    {
-    };
-   DOCUMENTATION = 
-    {
-    };
-   PARENTS = (Alarm, Blackout);
-   DEFINITION = 
-    {
-     NAMESTATES = (true, false);
-     PROBABILITIES = (0.00000000, 1.00000000, 0.88000000, 0.12000000, 
-     0.00000000, 1.00000000, 0.00100000, 0.99900000);
+     PROBABILITIES = (0.88000000, 0.12000000, 0.00100000, 0.99900000);
     };
    EXTRA_DEFINITION = 
     {
@@ -410,8 +349,8 @@ net Unnamed
     {
      POSITION = 
       {
-       CENTER_X = 516;
-       CENTER_Y = 343;
+       CENTER_X = 0;
+       CENTER_Y = 0;
        WIDTH = 76;
        HEIGHT = 36;
       };
@@ -478,12 +417,6 @@ net Unnamed
     };
 
    node Alarm
-    {
-     PARENTS = ();
-     COSTS = (0.00000000);
-    };
-
-   node Blackout
     {
      PARENTS = ();
      COSTS = (0.00000000);

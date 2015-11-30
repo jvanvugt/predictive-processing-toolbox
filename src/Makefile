@@ -9,7 +9,7 @@ CXXFILESi= LibPCTInference.cpp
 CXXINTERMEDIATEi= LibPCTInference.o
 CXXOUTPUTLIBSi= LibPCTInference.so
 CXXFLAGS= -O3 -DNDEBUG -ffast-math -Wall -fPIC
-LIBS = -L./smile/ -lsmile
+LIBS = -L ../smile/ -lsmile
 all: lib
 lib:
 	$(CXX) $(CXXFLAGS) $(LIBS) -c $(CXXFILESb)

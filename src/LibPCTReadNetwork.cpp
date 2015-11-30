@@ -10,36 +10,32 @@ using namespace std;
 #include <typeinfo>
 
 extern "C" {
+	
+  DSL_network* LoadNetwork(char* name) {
+	DSL_network* network = new DSL_network();
+	network->ReadFile(name, DSL_DSL_FORMAT);
+	return network;	  
+  }
   
-  int NodeExists(char * NetworkName, char* NodeName) {
-	DSL_network theNet;
-	theNet.ReadFile(NetworkName,DSL_DSL_FORMAT);
-	return theNet.FindNode(NodeName);
+  void ReloadNetwork(DSL_network* Network, char* name) {
+	  Network->ReadFile(name, DSL_DSL_FORMAT);
+  }
+  
+  bool NodeExists(DSL_network* Network, char* NodeName) {
+	return Network->FindNode(NodeName) != DSL_OUT_OF_RANGE;
   };
   
-  int NodeNumber(char * NetworkName) {
-	DSL_network theNet;
-	theNet.ReadFile(NetworkName,DSL_DSL_FORMAT);
-	return theNet.GetNumberOfNodes();
+  int NodeNumber(DSL_network* Network) {
+	return Network->GetNumberOfNodes();
   };
 
-  char** GetOutcomes(char * NetworkName, char* NodeName) {
-	DSL_network theNet;
-	theNet.ReadFile(NetworkName,DSL_DSL_FORMAT);
-	int Node=theNet.FindNode(NodeName);
-	DSL_idArray* Outcomes=theNet.GetNode(Node)->Definition()->GetOutcomesNames();
-	int OutcomeNumber=theNet.GetNode(Node)->Definition()->GetNumberOfOutcomes();
+  char** GetOutcomes(DSL_network* Network, char* NodeName) {
+	int Node=Network->FindNode(NodeName);
+	DSL_idArray* Outcomes=Network->GetNode(Node)->Definition()->GetOutcomesNames();
+	int OutcomeNumber=Network->GetNode(Node)->Definition()->GetNumberOfOutcomes();
 
 	char **Rstr = (char**)malloc(sizeof(char *) * (OutcomeNumber+1));
-	int ioutcome;
-// 	DSL_node* node;
-// 	
-// // 	if (parentnumber!=0)
-// // 		for (int i = 0; i < parentnumber+1; i++){
 	for (int i = 0; i < OutcomeNumber; i++){
-// 		iparent = parents[i];
-// 		if (i<parentnumber)
-// 		{ node = theNet.GetNode(iparent); }
 		Rstr[i] = (char*)malloc(MAX_STRING + 1);
 		strncpy(Rstr[i], (*Outcomes)[i], MAX_STRING);
 	}
@@ -49,16 +45,12 @@ extern "C" {
   };
   
   
-  char** NodeNames(char * NetworkName) {
-	DSL_network theNet;
-	theNet.ReadFile(NetworkName,DSL_DSL_FORMAT);
-	int NodeNumber = theNet.GetNumberOfNodes();
+  char** NodeNames(DSL_network* Network) {
+	int NodeNumber = Network->GetNumberOfNodes();
 
 	char **Rstr = (char**)malloc(sizeof(char *) * (NodeNumber+1));
-	DSL_node* node;
-	for (int i = 0; i < NodeNumber+1; i++){
-		if (i<NodeNumber)
-		{ node = theNet.GetNode(i); }
+	for (int i = 0; i < NodeNumber; i++){
+		DSL_node* node = Network->GetNode(i); 
 		Rstr[i] = (char*)malloc(MAX_STRING + 1);
 		strncpy(Rstr[i], (char*)node->Info().Header().GetId(), MAX_STRING);
 	}
@@ -67,20 +59,14 @@ extern "C" {
   };
 
   
-  char** GetParents(char * NetworkName, char* NodeName) {
-	DSL_network theNet;
-	theNet.ReadFile(NetworkName,DSL_DSL_FORMAT);
-	int Node=theNet.FindNode(NodeName);
-	DSL_intArray parents=theNet.GetParents(Node);
+  char** GetParents(DSL_network* Network, char* NodeName) {
+	int Node=Network->FindNode(NodeName);
+	DSL_intArray parents=Network->GetParents(Node);
 	int parentnumber=parents.NumItems();
 
 	char **Rstr = (char**)malloc(sizeof(char *) * (parentnumber+1));
-	int iparent;
-	DSL_node* node;
 	for (int i = 0; i < parentnumber; i++){
-		iparent = parents[i];
-		if (i<parentnumber)
-		{ node = theNet.GetNode(iparent); }
+		DSL_node* node = Network->GetNode(parents[i]);
 		Rstr[i] = (char*)malloc(MAX_STRING + 1);
 		strncpy(Rstr[i], (char*)node->Info().Header().GetId(), MAX_STRING);
 	}
@@ -90,20 +76,14 @@ extern "C" {
   };
   
 
-  char** GetChildren(char * NetworkName, char* NodeName) {
-	DSL_network theNet;
-	theNet.ReadFile(NetworkName,DSL_DSL_FORMAT);
-	int Node=theNet.FindNode(NodeName);
-	DSL_intArray children=theNet.GetChildren(Node);
+  char** GetChildren(DSL_network* Network, char* NodeName) {
+	int Node=Network->FindNode(NodeName);
+	DSL_intArray children=Network->GetChildren(Node);
 	int childnumber=children.NumItems();
 
 	char **Rstr = (char**)malloc(sizeof(char *) * (childnumber+1));
-	int ichild;
-	DSL_node* node;
 	for (int i = 0; i < childnumber; i++){
-		ichild = children[i];
-		if (i<childnumber)
-		{ node = theNet.GetNode(ichild); }
+		DSL_node* node = Network->GetNode(children[i]);
 		Rstr[i] = (char*)malloc(MAX_STRING + 1);
 		strncpy(Rstr[i], (char*)node->Info().Header().GetId(), MAX_STRING);
 	}
