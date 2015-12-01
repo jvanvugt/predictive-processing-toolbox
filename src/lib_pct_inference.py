@@ -45,10 +45,10 @@ def BelieveUpdating(Network, Algorithm=0, TargetNodes=["Node"], EvidenceNodes=["
 		i+=1
 	return probs
 
-def P11(TargetNode="Node", EvidenceNode="Node"): # Probability of one Target given one evidence node
+def P11(Network, TargetNode="Node", EvidenceNode="Node"): # Probability of one Target given one evidence node
 	Outcomes = GetOutcomes(NodeName=EvidenceNode);
 	for outcome in Outcomes:
-		probs=BelieveUpdating(TargetNodes=[TargetNode], EvidenceNodes=[EvidenceNode], Evidences=[outcome])	
+		probs=BelieveUpdating(Network, TargetNodes=[TargetNode], EvidenceNodes=[EvidenceNode], Evidences=[outcome])	
 		print outcome, probs
 	
 def P1(Network, TargetNode="Node", EvidenceNodes=["Node"]):# Probability distribution of one target with multiple evidence nodes
