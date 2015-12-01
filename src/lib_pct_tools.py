@@ -1,4 +1,5 @@
 from math import log
+from ctypes import string_at
 
 def KL(P,Q, base=2):
 	kl = 0;

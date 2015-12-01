@@ -2,15 +2,15 @@ from ctypes import *
 import numpy
 from lib_pct_tools import *
 
-PCTr=CDLL("./LibPCTReadnetwork.so")
+PCTr=CDLL("./LibPCTReadNetwork.so")
 
-PCTr.Loadnetwork.restype = c_void_p
+PCTr.LoadNetwork.restype = c_void_p
 
-PCTr.Reloadnetwork.argtypes = [c_void_p, c_char_p]
-PCTr.Reloadnetwork.restype = None
+PCTr.ReloadNetwork.argtypes = [c_void_p, c_char_p]
+PCTr.ReloadNetwork.restype = None
 
-PCTr.node_names.argtypes = [c_void_p]
-PCTr.node_names.restype = POINTER(POINTER(c_char))
+PCTr.NodeNames.argtypes = [c_void_p]
+PCTr.NodeNames.restype = POINTER(POINTER(c_char))
 
 PCTr.NodeNumber.argtypes = [c_void_p]
 PCTr.NodeNumber.restype = c_int
@@ -31,13 +31,13 @@ PCTr.NodeExists.argtypes = [c_void_p, c_char_p]
 default_network_name = "Testnetwork"
 
 def load_network(network, network_name=default_network_name):
-	PCTr.Loadnetwork(network, ensure_extension(network_name, '.dsl'))
+	PCTr.LoadNetwork(network, ensure_extension(network_name, '.dsl'))
 
 def reload_network(network, network_name=default_network_name):
 	"""
 		Reload the network from the file
 	"""
-	PCTr.Reloadnetwork(network, ensure_extension(network_name, '.dsl'))
+	PCTr.ReloadNetwork(network, ensure_extension(network_name, '.dsl'))
 
 def node_exists(network, node_name):
 	"""
@@ -57,7 +57,7 @@ def node_names(network):
 	"""
 		Return a list of all the names of the nodes in the network
 	"""
-	c_names = PCTr.node_names(network)
+	c_names = PCTr.NodeNames(network)
 	return from_char_p_array(c_names)
 
 

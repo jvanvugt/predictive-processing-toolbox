@@ -1,9 +1,5 @@
-from lib_pct_build_network import *
-from lib_pct_read_network import *
-from lib_pct_inference import *
-from Alarm_base import *
+from pct_network import PCTNetwork
 
-
-
-net = create_alarm_network()
-print BelieveUpdating(net, TargetNodes=["Alarm", "Smoke"], EvidenceNodes=["Fire", "Tampering"], Evidences=["true", "false"])
+net = PCTNetwork()
+net.load_from_file("Alarm")
+print net.get_nodes()

@@ -11,7 +11,7 @@ using namespace std;
 
 extern "C" {
 	
-  DSL_network* LoadNetwork(DSL_network* network, char* name) {
+  void LoadNetwork(DSL_network* network, char* name) {
 	network->ReadFile(name, DSL_DSL_FORMAT);
   }
   
@@ -45,13 +45,13 @@ extern "C" {
   
   char** NodeNames(DSL_network* Network) {
 	int NodeNumber = Network->GetNumberOfNodes();
-
 	char **Rstr = (char**)malloc(sizeof(char *) * (NodeNumber+1));
 	for (int i = 0; i < NodeNumber; i++){
 		DSL_node* node = Network->GetNode(i); 
 		Rstr[i] = (char*)malloc(MAX_STRING + 1);
 		strncpy(Rstr[i], (char*)node->Info().Header().GetId(), MAX_STRING);
 	}
+	Rstr[NodeNumber] = (char*) malloc(MAX_STRING + 1);
 	strncpy(Rstr[NodeNumber], "LISTEND", MAX_STRING);  	//Note end of list for processing in python
 	return Rstr; 
   };

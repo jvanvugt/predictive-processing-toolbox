@@ -3,7 +3,7 @@ import numpy
 from lib_pct_tools import *
 from lib_pct_read_network import *
 
-PCTb=CDLL("./LibPCTBuildnetwork.so")
+PCTb=CDLL("./LibPCTBuildNetwork.so")
 
 default_network_name = "TestNetwork"
 
