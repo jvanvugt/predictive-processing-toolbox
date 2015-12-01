@@ -35,34 +35,37 @@ def BelieveUpdating(Network, Algorithm=0, TargetNodes=["Node"], EvidenceNodes=["
 
 	c_probs = PCTi.BelieveUpdating(Network, Algorithm, c_TargetNodes, c_EvidenceNodes, c_Evidences);
 	probs = []
-	i=0
-	while c_probs[i] != -3:
-		innerprobs = []
-		while c_probs[i] != -2:
-			innerprobs.append(c_probs[i])
-			i += 1
-		probs.append(innerprobs)
-		i+=1
+	innerprobs = []
+	for prob in c_probs:
+		if prob == -3:
+			break
+		elif prob == -2: 
+			probs.append(innerprobs)
+			innerprobs = []
+		else:
+			innerprobs.append(prob)
 	return probs
 
 def P11(Network, TargetNode="Node", EvidenceNode="Node"): # Probability of one Target given one evidence node
-	Outcomes = GetOutcomes(NodeName=EvidenceNode);
+	Outcomes = get_outcomes(Network, EvidenceNode);
 	for outcome in Outcomes:
 		probs=BelieveUpdating(Network, TargetNodes=[TargetNode], EvidenceNodes=[EvidenceNode], Evidences=[outcome])	
 		print outcome, probs
 	
-def P1(Network, TargetNode="Node", EvidenceNodes=["Node"]):# Probability distribution of one target with multiple evidence nodes
+def P1(Network, TargetNode="Node", EvidenceNodes=["Node"]):
+	# Probability distribution of one target with multiple evidence nodes
 	OutcomeLists=[];
 	for node in EvidenceNodes:
-		OutcomeLists.append(GetOutcomes(Network=Network, NodeName=node));
-	OutcomeCombinations = itertools.product(*OutcomeLists); # generates all possible combinations of the outcomes of the individual nodes
+		OutcomeLists.append(get_outcomes(Network, node));
+	# Generate all possible combinations of the outcomes of the individual nodes
+	OutcomeCombinations = itertools.product(*OutcomeLists); 
 
 	ReturnOutcomes=[];
 	ReturnProbs=[];
 	for outcome in OutcomeCombinations:
 		probs=BelieveUpdating(Network=Network, TargetNodes=[TargetNode], EvidenceNodes=EvidenceNodes, Evidences=list(outcome))	
 		ReturnOutcomes.append(list(outcome));
-		ReturnProbs.append(probs[0:len(probs)-1])
+		ReturnProbs.append(probs)
 	return [ReturnOutcomes,ReturnProbs]; # returns names of outcome and probabilities of outcomes in format of list of distributions. There, distributions are lists with as many entries as outcomes, List of distribution is a list with one entry for any combination of Evidences. If evidences A,B can be both [T,F], then the list has four entries with [TT,TF,FT,FF]. (And a distribution for each entry.)
 	
 	
@@ -82,7 +85,8 @@ def P(Network, TargetNodes=["Node"], EvidenceNodes=["Node"]):# JOINT probability
 		if len(JointProbabilities)!=0:
 			OutcomeDevider=len(JointProbabilities)/len(Probs);
 			for j in range(len(JointProbabilities)):
-				JointProbabilities[j] *= Probs[j/OutcomeDevider];
+				for k in range(len(JointProbabilities[j])):
+					JointProbabilities[j][k] *= Probs[j/OutcomeDevider][k];
 		else:
 			JointProbabilities = Probs;
 	FinalProbs = [];
