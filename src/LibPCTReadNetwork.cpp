@@ -11,10 +11,8 @@ using namespace std;
 
 extern "C" {
 	
-  DSL_network* LoadNetwork(char* name) {
-	DSL_network* network = new DSL_network();
+  DSL_network* LoadNetwork(DSL_network* network, char* name) {
 	network->ReadFile(name, DSL_DSL_FORMAT);
-	return network;	  
   }
   
   void ReloadNetwork(DSL_network* Network, char* name) {

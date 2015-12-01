@@ -8,13 +8,12 @@ using namespace std;
 
 extern "C" {
   
-  DSL_network* CreateNetwork(char* NetworkName) {
+  DSL_network* CreateNetwork() {
     DSL_network* network = new DSL_network();
-    network->WriteFile(NetworkName, DSL_DSL_FORMAT);
     return network;
   };
   
-  void AddNode(DSL_network* Network, char* NodeName, char * Outcomes[], double Probabilities[], int OutcomeNumber) {
+  void AddNode(DSL_network* Network, char* NodeName, char* Outcomes[], double Probabilities[], int OutcomeNumber) {
     int NewNode = Network->AddNode(DSL_CPT,NodeName);
 
     DSL_idArray NodeOutcomes;
@@ -44,7 +43,7 @@ extern "C" {
     Network->DeleteNode(Network->FindNode(NodeName));
   };
 
-  void SetOutcomes(DSL_network* Network, char* NodeName, char * Outcomes[], int OutcomeNumber) {
+  void SetOutcomes(DSL_network* Network, char* NodeName, char* Outcomes[], int OutcomeNumber) {
     int Node=Network->FindNode(NodeName);
     DSL_idArray NodeOutcomes;
     for (int i=0; i<OutcomeNumber; i++) { 
