@@ -79,23 +79,22 @@ def BeliefRevision1(NetworkName=DefaultNetworkName,HypothesisNodes=["Node"], Pre
 	return xmin, Pminimize(numpy.asarray(xmin), disp=False, plotting=False)
 
 
-def BeliefRevision(NetworkName=DefaultNetworkName,HypothesisNodes=["Node"], PredictionNodes=["Node"], Observations=[0.5,0.5], Method = 'Local Min', Searchgrid = 5, FullOutput = False, Ploting3D = False):
+def BeliefRevision(Net, HypothesisNodes=["Node"], PredictionNodes=["Node"], Observations=[0.5,0.5], Method = 'Local Min', Searchgrid = 5, FullOutput = False, Ploting3D = False):
 	dim = 0; HypOutcomeNumber = [];
 	for Hyp in HypothesisNodes:
-		if GetParents(NetworkName, Hyp)!=[]:
+		if Net.get_node_parents(Hyp)!=[]:
 			print Hyp, " is not a hypothesis node."
 			return 0
-		OutcomeNumber = len(GetOutcomes(NetworkName,Hyp));
+		OutcomeNumber = len(Net.get_node_outcomes(Hyp));
 		dim += OutcomeNumber;
 		HypOutcomeNumber.append(OutcomeNumber);
 	
 	for Pred in PredictionNodes:
-		if GetChildren(NetworkName, Pred)!=[]:
+		if Net.get_node_children(Pred)!=[]:
 			print Pred, " is not a prediction node."
 			return 0
 	# TODO also check number of outcomes in predictions TODO #
 	# TODO check sum of observations=1 TODO #
-
 	ih = 0; idim = 0;
 	x0 = numpy.ones(dim)/dim;
 	while True:
@@ -117,16 +116,15 @@ def BeliefRevision(NetworkName=DefaultNetworkName,HypothesisNodes=["Node"], Pred
 				x_node = 1.0/node_dim * numpy.ones_like(x_node);
 			else:
 				x_node = x_node/sum(x_node);
-			SetProbabilities(NetworkName, HypothesisNodes[ih], list(x_node));
+			Net.set_probabilities(HypothesisNodes[ih], list(x_node));
 			if ih==0:
 				if plotting: xplotx.append(x_node[0]); xploty.append(x_node[1]); xplotz.append(x_node[2]);
 				if disp: print "Hyp", x_node, sum(x_node); print "Pred", Probs[0]; print "Obs", Observations
 			ih+=1; idim+=node_dim;
 			if idim == dim: break;
 			
-		Outcomes, Probs = P(NetworkName=NetworkName,TargetNodes=PredictionNodes, EvidenceNodes=[]);
-		return KL(Probs[0], Observations)
-
+		Outcomes, Probs = P(Net.network,TargetNodes=PredictionNodes, EvidenceNodes=[]);
+		return KL(Probs[0][0], Observations)
 	def constraints(x):
 		ih = 0; idim = 0;
 		totalsum = 0;
@@ -180,14 +178,12 @@ def BeliefRevision(NetworkName=DefaultNetworkName,HypothesisNodes=["Node"], Pred
 			i+=1;
 		KLmin = Dmin;
 	
-		
 	ih = 0; idim = 0;
 	while True:
 		node_dim = HypOutcomeNumber[ih];
 		xmin[idim : (idim + node_dim)]= xmin[idim : (idim + node_dim)]/sum(xmin[idim : (idim + node_dim)]);
 		ih+=1; idim+=node_dim;
 		if idim == dim: break;
-	
 	if Ploting3D:
 		fig = figure()
 		ax = fig.add_subplot(111, projection='3d')

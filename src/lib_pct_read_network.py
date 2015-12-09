@@ -6,9 +6,6 @@ PCTr=CDLL("./LibPCTReadNetwork.so")
 
 PCTr.LoadNetwork.restype = c_void_p
 
-PCTr.ReloadNetwork.argtypes = [c_void_p, c_char_p]
-PCTr.ReloadNetwork.restype = None
-
 PCTr.NodeNames.argtypes = [c_void_p]
 PCTr.NodeNames.restype = POINTER(POINTER(c_char))
 
@@ -28,16 +25,10 @@ PCTr.NodeExists.restype = c_bool
 PCTr.NodeExists.argtypes = [c_void_p, c_char_p]
 
 
-default_network_name = "Testnetwork"
+default_network_name = "TestNetwork"
 
 def load_network(network, network_name=default_network_name):
 	PCTr.LoadNetwork(network, ensure_extension(network_name, '.dsl'))
-
-def reload_network(network, network_name=default_network_name):
-	"""
-		Reload the network from the file
-	"""
-	PCTr.ReloadNetwork(network, ensure_extension(network_name, '.dsl'))
 
 def node_exists(network, node_name):
 	"""

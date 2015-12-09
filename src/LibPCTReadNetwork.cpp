@@ -12,11 +12,9 @@ using namespace std;
 extern "C" {
 	
   void LoadNetwork(DSL_network* network, char* name) {
-	network->ReadFile(name, DSL_DSL_FORMAT);
-  }
-  
-  void ReloadNetwork(DSL_network* Network, char* name) {
-	  Network->ReadFile(name, DSL_DSL_FORMAT);
+	int result = network->ReadFile(name, DSL_DSL_FORMAT);
+	if(result == -127)
+		cout << "File might not have been loaded successfully" << endl;
   }
   
   bool NodeExists(DSL_network* Network, char* NodeName) {

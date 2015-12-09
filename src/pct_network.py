@@ -49,7 +49,7 @@ class PCTNetwork(object):
 			(e.g. ["true", "false"])
 		"""
 		if node_name not in self.get_nodes():
-			raise ValueError("node %s not in network".format(node_name))
+			raise ValueError("node {0} not in network".format(node_name))
 		else:
 			return get_outcomes(self.network, node_name)
 		
@@ -58,7 +58,7 @@ class PCTNetwork(object):
 			Return a list containing the names of the parents of the node
 		"""
 		if node_name not in self.get_nodes():
-			raise ValueError("node %s not in network".format(node_name))
+			raise ValueError("node {0} not in network".format(node_name))
 		else:
 			return get_parents(self.network, node_name)
 			
@@ -67,7 +67,7 @@ class PCTNetwork(object):
 			Return a list containing the names of the children of the node
 		"""
 		if node_name not in self.get_nodes():
-			raise ValueError("node %s not in network".format(node_name))
+			raise ValueError("node {0} not in network".format(node_name))
 		else:
 			return get_children(self.network, node_name)
 			
@@ -88,7 +88,7 @@ class PCTNetwork(object):
 			Delete the node from the network
 		"""
 		if node_name not in self.get_nodes():
-			raise ValueError("node %s not in network".format(node_name))
+			raise ValueError("node {0} not in network".format(node_name))
 		else:
 			delete_node(self.network, node_name)
 	
@@ -97,7 +97,7 @@ class PCTNetwork(object):
 			Set the outcomes of a node
 		"""
 		if node_name not in self.get_nodes():
-			raise ValueError("node %s not in network".format(node_name))
+			raise ValueError("node {0} not in network".format(node_name))
 		else:
 			set_outcomes(self.network, node_name, outcomes)
 			
@@ -106,7 +106,7 @@ class PCTNetwork(object):
 			Set the probabilities of a node
 		"""
 		if node_name not in self.get_nodes():
-			raise ValueError("node %s not in network".format(node_name))
+			raise ValueError("node {0} not in network".format(node_name))
 		else:
 			set_probabilities(self.network, node_name, probabilities)
 	
@@ -115,9 +115,9 @@ class PCTNetwork(object):
 			Add an arc from start_node to goal_node
 		"""
 		if start_node not in self.get_nodes():
-			raise ValueError("node %s not in network".format(start_node))
+			raise ValueError("node {0} not in network".format(start_node))
 		if goal_node not in self.get_nodes():
-			raise ValueError("node %s not in network".format(goal_node))
+			raise ValueError("node {0} not in network".format(goal_node))
 		else:
 			add_arc(self.network, start_node, goal_node)
 	

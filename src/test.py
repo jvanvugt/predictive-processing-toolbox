@@ -1,9 +1,9 @@
 from pct_network import PCTNetwork
 from lib_pct_inference import *
+from lib_pct_revision import *
+
+convert_from_genie("new")
 
 net = PCTNetwork()
-net.load_from_file("Alarm")
-# print BelieveUpdating(net.network, 0, ["Alarm", "Leaving"], ["Fire", "Smoke"], ["true", "true"])
-# P11(net.network, "Alarm", "Smoke")
-# print len(P1(net.network, "Alarm", ["Smoke", "Fire"]))
-print P(net.network, ["Alarm"], ["Smoke", "Fire"])
+net.load_from_file("new.dsl")
+print BeliefRevision(net, ["BIN_1"], ["COLOR"], [0.3719,0.1344,0.2720,0.2217])
