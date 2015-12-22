@@ -6,4 +6,4 @@ convert_from_genie("new")
 
 net = PCTNetwork()
 net.load_from_file("new.dsl")
-print BeliefRevision(net, ["BIN_1"], ["COLOR"], [0.3719,0.1344,0.2720,0.2217])
+print belief_revision(net, ["BIN_1"], ["COLOR"], [0.3719,0.1344,0.2720,0.2217])

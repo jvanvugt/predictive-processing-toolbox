@@ -7,33 +7,34 @@ from lib_pct_read_network import *
 
 PCTi=CDLL("./LibPCTInference.so")
 
-PCTi.BelieveUpdating.restype = POINTER(c_double);
+PCTi.BeliefUpdating.restype = POINTER(c_double)
 
-def PossibleAlgorithms():
-	return ["Lauritzen","Henrion","Pearl","lsampling","selfimportance","backsampling","aissampling","epissampling","lbp","Lauritzen_old"];
+POSSIBLE_ALGORITHMS = ["Lauritzen", "Henrion", "Pearl", 
+    "lsampling", "selfimportance", "backsampling", 
+    "aissampling", "epissampling", "lbp", "Lauritzen_old"]
 		
-def BelieveUpdating(Network, Algorithm=0, TargetNodes=["Node"], EvidenceNodes=["Node"], Evidences=["true"]):
+def belief_updating(network, algorithm="Lauritzen", target_nodes, evidence_nodes, evidences=["true"]):
 	## TODO  check by hand if the joint probability is computed correctly
-	if type(Algorithm)==str:
-		Algorithm=PossibleAlgorithms().index(Algorithm);
-	## Algorithms in the smile libary are indicised as in the PossibleAlgorithms function.
+	if type(algorithm)==str:
+		algorithm = POSSIBLE_ALGORITHMS.index(algorithm)
+	## Algorithms in the smile libary are indicised as in POSSIBLE_ALGORITHMS.
 	###### TODO: if value of NodeEvidence is int, find appropriate NodeEvidence value by getOutcomes
 
 	# Todo: set targets, set evidence, set algorithm, update, return targets
-	TargetNodes.append('LISTEND');
-	c_TargetNodes=(c_char_p * (len(TargetNodes)) ) ()
-	for i in range(len(TargetNodes)):
-		c_TargetNodes[i] = c_char_p(TargetNodes[i]);
-	EvidenceNodes.append('LISTEND');
-	c_EvidenceNodes=(c_char_p * (len(EvidenceNodes)) ) ()
-	for i in range(len(EvidenceNodes)):
-		c_EvidenceNodes[i] = c_char_p(EvidenceNodes[i]);
-	Evidences.append('LISTEND');
-	c_Evidences=(c_char_p * (len(Evidences)) ) ()
+	target_nodes.append('LISTEND')
+	c_target_nodes = (c_char_p * (len(target_nodes)) ) ()
+	for i in range(len(target_nodes)):
+		c_target_nodes[i] = c_char_p(target_nodes[i])
+	evidence_nodes.append('LISTEND')
+	c_evidence_nodes=(c_char_p * (len(evidence_nodes)) ) ()
+	for i in range(len(evidence_nodes)):
+		c_evidence_nodes[i] = c_char_p(evidence_nodes[i])
+	evidences.append('LISTEND')
+	c_evidences = (c_char_p * (len(evidences)) ) ()
 	for i in range(len(Evidences)):
-		c_Evidences[i] = c_char_p(Evidences[i]);
+		c_evidences[i] = c_char_p(evidences[i])
 
-	c_probs = PCTi.BelieveUpdating(Network, Algorithm, c_TargetNodes, c_EvidenceNodes, c_Evidences);
+	c_probs = PCTi.BeliefUpdating(network, algorithm, c_target_nodes, c_evidence_nodes, c_evidences)
 	probs = []
 	innerprobs = []
 	for prob in c_probs:
@@ -46,83 +47,75 @@ def BelieveUpdating(Network, Algorithm=0, TargetNodes=["Node"], EvidenceNodes=["
 			innerprobs.append(prob)
 	return probs
 
-def P11(Network, TargetNode="Node", EvidenceNode="Node"): # Probability of one Target given one evidence node
-	Outcomes = get_outcomes(Network, EvidenceNode);
-	for outcome in Outcomes:
-		probs=BelieveUpdating(Network, TargetNodes=[TargetNode], EvidenceNodes=[EvidenceNode], Evidences=[outcome])	
+def P11(network, target_node, evidence_node): # Probability of one Target given one evidence node
+	outcomes = network.get_node_outcomes(evidence_node)
+	for outcome in outcomes:
+		probs = belief_updating(network, target_node, evidence_node, evidences)	
 		print outcome, probs
 	
-def P1(Network, TargetNode="Node", EvidenceNodes=["Node"]):
+def P1(Network, target_node, evidence_nodes):
 	# Probability distribution of one target with multiple evidence nodes
-	OutcomeLists=[];
-	for node in EvidenceNodes:
-		OutcomeLists.append(get_outcomes(Network, node));
+	outcome_lists = []
+	for node in evidence_nodes:
+		outcome_lists.append(network.get_node_outcomes(node))
 	# Generate all possible combinations of the outcomes of the individual nodes
-	OutcomeCombinations = itertools.product(*OutcomeLists); 
+	outcome_combinations = itertools.product(*OutcomeLists)
 
-	ReturnOutcomes=[];
-	ReturnProbs=[];
-	for outcome in OutcomeCombinations:
-		probs=BelieveUpdating(Network=Network, TargetNodes=[TargetNode], EvidenceNodes=EvidenceNodes, Evidences=list(outcome))	
-		ReturnOutcomes.append(list(outcome));
-		ReturnProbs.append(probs)
-	return [ReturnOutcomes,ReturnProbs]; # returns names of outcome and probabilities of outcomes in format of list of distributions. There, distributions are lists with as many entries as outcomes, List of distribution is a list with one entry for any combination of Evidences. If evidences A,B can be both [T,F], then the list has four entries with [TT,TF,FT,FF]. (And a distribution for each entry.)
+	return_outcomes = []
+	return_probs = []
+	for outcome in outcome_combinations:
+		probs = belief_updating(network, target_node, evidence_nodes, list(outcome))	
+		return_outcomes.append(list(outcome))
+		return_probs.append(probs)
+	return return_outcomes, return_probs 
+    # returns names of outcome and probabilities of outcomes in format of list of distributions. There, distributions are lists with as many entries as outcomes, List of distribution is a list with one entry for any combination of Evidences. If evidences A,B can be both [T,F], then the list has four entries with [TT,TF,FT,FF]. (And a distribution for each entry.)
 	
 	
 
-def P(Network, TargetNodes=["Node"], EvidenceNodes=["Node"]):# JOINT probability of multiple targets given multiple evidence nodes
+def P(network, target_nodes, evidence_nodes):
+    # JOINT probability of multiple targets given multiple evidence nodes
 	# P(A,B|C,D) = P(A|B,C,D) * P(B|C,D) --> call P1()
-	i=0;
-	JointProbabilities=[];
-	OutcomeDevider=1;
-	for target in TargetNodes:
-		PureOutcomes, PureProbs = P1(Network=Network, TargetNode=target, EvidenceNodes=TargetNodes[i+1:] + EvidenceNodes)
-		i+=1;
+	joint_probabilities = []
+	for i, target in enumerate(target_nodes):
+		pure_outcomes, pure_probs = P1(network, target, target_nodes[i+1:] + evidence_nodes)
+		i += 1
 		# Reformat output probs
-		Outcomes=[]; Probs=[];
-		for j in range(len(PureOutcomes)):
-			Probs = Probs + PureProbs[j];
-		if len(JointProbabilities)!=0:
-			OutcomeDevider=len(JointProbabilities)/len(Probs);
-			for j in range(len(JointProbabilities)):
-				for k in range(len(JointProbabilities[j])):
-					JointProbabilities[j][k] *= Probs[j/OutcomeDevider][k];
+		outcomes = []
+        probs = []
+		for j in range(len(pure_outcomes)):
+			probs = probs + pure_probs[j]
+		if len(joint_probabilities)!=0:
+			outcome_divider = len(joint_probabilities) / len(probs)
+			for j in range(len(joint_probabilities)):
+				for k in range(len(joint_probabilities[j])):
+					joint_probabilities[j][k] *= probs[j/outcome_divider][k]
 		else:
-			JointProbabilities = Probs;
-	FinalProbs = [];
-	packlength = len(JointProbabilities)/len(PureOutcomes);
-	for j in range(len(PureOutcomes)):
-		FinalProbs.append(JointProbabilities[j*packlength:(j+1)*packlength]);
-	return PureOutcomes,FinalProbs;
+			joint_probabilities = probs
+	final_probs = []
+	packlength = len(joint_probabilities) / len(pure_outcomes)
+	for j in range(len(pure_outcomes)):
+		final_probs.append(joint_probabilities[j*packlength:(j+1)*packlength])
+	return pure_outcomes, final_probs
 
 
 
-def Check_dependence2(Network, TargetNodes=["Node_1","Node_2"], EvidenceNodes=[], Disp = True):
+def check_dependence2(network, target_nodes, evidence_nodes=[], Disp=False):
 	# Returns bool stating if two nodes are dependent.
-	comparecounter = 0;
-	#for i in range(len(GetOutcomes(Network, NodeName = TargetNodes[1]))-1):
-		# print P(Network, [TargetNodes[0]], [TargetNodes[1]]+EvidenceNodes)[1][i]
-		#if P(Network, [TargetNodes[0]], [TargetNodes[1]]+EvidenceNodes)[1][i] != P(Network, [TargetNodes[0]], [TargetNodes[1]]+EvidenceNodes)[1][i+1]:
-			#comparecounter += 1;
-	#if comparecounter == 0:
-		#if Disp: print "Independent: ", TargetNodes[0], "and", TargetNodes[1]
-		#return False
-	#else:
-		#if Disp: print "Dependent: ", TargetNodes[0], "and", TargetNodes[1]
-		#return True
-	A = P(Network, [TargetNodes[0]], [TargetNodes[1]]+EvidenceNodes)[1]
-	B = P(Network, [TargetNodes[0]], EvidenceNodes)[1]
+	A = P(Network, [target_nodes[0]], [target_nodes[1]]+evidence_nodes)[1]
+	B = P(Network, [target_nodes[0]], evidence_nodes)[1]
 	if A == B * (len(A)/len(B)):
-		if Disp: print "Independent: ", TargetNodes[0], "and", TargetNodes[1], "given", EvidenceNodes
+		if Disp: 
+            print "Independent: ", target_nodes[0], "and", target_nodes[1], "given", evidence_nodes
 		return False
 	else:
-		if Disp: print "Dependent: ", TargetNodes[0], "and", TargetNodes[1], "given", EvidenceNodes
+		if Disp: 
+            print "Dependent: ", target_nodes[0], "and", target_nodes[1], "given", evidence_nodes
 		return True
-	# print P(Network, [TargetNodes[0]], EvidenceNodes)
+	# print P(Network, [target_nodes[0]], evidence_nodes)
 
-def Check_dependence(Network, TargetNodes=["Node_1","Node_2"], EvidenceNodes=[], Disp = False):
-	DependenceList = [];
-	for i in range(len(TargetNodes)-1):
-		for j in range(i+1,len(TargetNodes)):
-			DependenceList.append([TargetNodes[i],TargetNodes[j], Check_dependence2(Network,[TargetNodes[i],TargetNodes[j]],EvidenceNodes,Disp=Disp)]);
-	return DependenceList
+def check_dependence(network, target_nodes, evidence_nodes=[], Disp=False):
+	dependence_list = []
+	for i in range(len(target_nodes) - 1):
+		for j in range(i + 1, len(target_nodes)):
+			dependence_list.append([target_nodes[i], target_nodes[j], Check_dependence2(network, [target_nodes[i], target_nodes[j]], evidence_nodes, Disp=Disp)])
+	return dependence_list

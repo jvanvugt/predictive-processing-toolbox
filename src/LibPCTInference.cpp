@@ -26,7 +26,7 @@ extern "C" {
   
   
   
-  double* BelieveUpdating(DSL_network* Network, int AlgorithmIndex, char * TargetNodes[], char * EvidenceNodes[], char* Evidences[]){
+  double* BeliefUpdating(DSL_network* Network, int AlgorithmIndex, char * TargetNodes[], char * EvidenceNodes[], char* Evidences[]){
 	// DSL_node* node
   
 	// Set Algorithm

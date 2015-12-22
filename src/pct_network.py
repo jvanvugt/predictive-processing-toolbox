@@ -18,13 +18,6 @@ class PCTNetwork(object):
 		"""
 		write_network(self.network, filename)
 	
-	def reload(self, filename):
-		"""
-			Reload the network from the file
-			Call this function when the network file has been modified
-		"""
-		reload_network(self.network, filename)
-	
 	def has_node(self, node_name):
 		"""
 			Return True if node_name is in the network
