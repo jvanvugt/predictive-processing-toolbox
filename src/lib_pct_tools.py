@@ -8,7 +8,7 @@ def KL(P,Q, base=2):
 	return kl
 
 
-def ensure_extension(filename, extension):
+def ensure_extension(filename, extension='.dsl'):
 	"""
 		Make sure the filename has the specified extension
 		The extension should include the '.'
@@ -17,14 +17,14 @@ def ensure_extension(filename, extension):
 		return filename
 	else:
 		return filename + extension
-	
+
 def convert_from_genie(network_name):
 	f = open(ensure_extension(network_name, '.dsl'))
 	contents = f.read(); f.close()
 	contents = contents.replace('\r\n', '\n')
 	f = open(ensure_extension(network_name, '.dsl'), 'w')
 	f.write(contents); f.close()
-	
+
 def from_char_p_array(array):
 	"""
 		Convert a c list of char pointers with last element

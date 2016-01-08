@@ -10,21 +10,21 @@ default_network_name = "TestNetwork"
 
 def create_network():
 	return PCTb.CreateNetwork();
-	
+
 def write_network(network, network_name=default_network_name):
-	PCTb.WriteNetwork(network, Ending(networkName))
-	
+	PCTb.WriteNetwork(network, ensure_extension(network_name))
+
 def add_node(network, node_name, outcomes=["true", "false"], probabilities=[0.5, 0.5]):
 	if node_exists(network, node_name):
 		print "Node %s already exists" % node_name
-	
+
 	c_outcomes = (c_char_p * (len(outcomes)) ) ()
 	for i in range(len(outcomes)):
 		c_outcomes[i] = c_char_p(outcomes[i])
 
-	if len(probabilities)!=len(outcomes): 
+	if len(probabilities)!=len(outcomes):
 		probabilities = numpy.ones(len(outcomes)) / len(outcomes)
-	
+
 	# Check values of probabilities
 	if sum(probabilities) != 1.0:
 		rest = 1 - sum(probabilities[0:len(probabilities) - 1])
@@ -36,10 +36,10 @@ def add_node(network, node_name, outcomes=["true", "false"], probabilities=[0.5,
 
 	c_probabilities = (c_double * (len(probabilities)) ) ()
 	for i in range(len(probabilities)):
-		c_probabilities[i] = c_double(Probabilities[i])
+		c_probabilities[i] = c_double(probabilities[i])
 
 	PCTb.AddNode(network, node_name, c_outcomes, c_probabilities, len(outcomes));
-	
+
 
 def add_value_node(network, node_name="Node"):
 	PCTb.AddValueNode(network, node_name)
@@ -54,8 +54,8 @@ def set_outcomes(network, node_name="Node", outcomes=["true","false"]):
 	######To check: if NodeName exists, what to do if not?
 	######Only possible to change number of outcomes if node has no children
 	c_outcomes = (c_char_p * (len(outcomes)) )
-	
-	for i in range(len(Outcomes)):
+
+	for i in range(len(outcomes)):
 		c_outcomes[i] = c_char_p(outcomes[i])
 	PCTb.SetOutcomes(network, node_name, c_outcomes, len(outcomes))
 
@@ -73,5 +73,3 @@ def set_probabilities(network, node_name="Node", probabilities=[0.5,0.5]):
 def add_arc(network, start_node="Node", goal_node="Node1"):
 	######To check: if Nodes exist, what to do if not?
 	PCTb.AddArc(network, start_node, goal_node)
-	
-	

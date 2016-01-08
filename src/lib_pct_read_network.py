@@ -28,7 +28,7 @@ PCTr.NodeExists.argtypes = [c_void_p, c_char_p]
 default_network_name = "TestNetwork"
 
 def load_network(network, network_name=default_network_name):
-	PCTr.LoadNetwork(network, ensure_extension(network_name, '.dsl'))
+	PCTr.LoadNetwork(network, ensure_extension(network_name))
 
 def node_exists(network, node_name):
 	"""
@@ -74,4 +74,3 @@ def get_children(network, node_name):
 	"""
 	c_names = PCTr.GetChildren(network, node_name)
 	return from_char_p_array(c_names)
-	
